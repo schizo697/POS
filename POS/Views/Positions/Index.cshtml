@@ -1,0 +1,195 @@
+﻿@model IEnumerable<POS.Models.Position>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+        New Position
+    </button>
+</p>
+
+<!-- ADD MODAL FORM -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Add Position & Salary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="bg-white p-4 rounded shadow-lg">
+                    <!-- Fix: Use a separate instance inside the form -->
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label for="Title" class="form-label">Title</label>
+                            <input type="text" name="Title" class="form-control" required />
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Salary" class="form-label">Salary</label>
+                            <input type="text" name="Salary" pattern="^\d+(\.\d{1,2})?$" class="form-control" required />
+                            <span class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="table" class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Salary)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Salary)
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal-@item.PositionId">
+                        Edit
+                    </button>
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal-@item.PositionId">
+                        Details
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.PositionId">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        
+            <!-- EDIT MODAL FORM -->
+            <div class="modal fade" id="editModal-@item.PositionId" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Edit Position & Salary</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="bg-white p-4 rounded shadow-lg">
+                                <form asp-controller="Positions" asp-action="Edit" asp-route-id="@item.PositionId">
+                                    <div class="row">
+                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                        <input type="hidden" name="PositionId" value="@item.PositionId" />
+                                        <div class="mb-3">
+                                            <label name="Title" class="control-label">Title</label>
+                                            <input type="text" name="Title" class="form-control" value="@item.Title" />
+                                            <span class="text-danger"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label name="Salary" class="control-label">Salary</label>
+                                            <input type="text" name="Salary" class="form-control" pattern="^\d+(\.\d{1,2})?$" value="@item.Salary" />
+                                            <span class="text-danger"></span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <input type="submit" value="Save" class="btn btn-primary" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- DETAILS MODAL FORM -->
+            <div class="modal fade" id="detailsModal-@item.PositionId" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Edit Position & Salary</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <h4>Details</h4>
+                                <hr />
+                                <dl class="row">
+                                    <dt class="col-sm-2">
+                                        Title:
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @item.Title
+                                    </dd>
+                                    <dt class="col-sm-2">
+                                        Salary:
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @item.Salary
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- DELETE MODAL FORM -->
+            <div class="modal fade" id="deleteModal-@item.PositionId" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Delete Position & Salary</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <h4>Details</h4>
+                                <hr />
+                                <dl class="row">
+                                    <dt class="col-sm-2">
+                                        Title:
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @item.Title
+                                    </dd>
+                                    <dt class="col-sm-2">
+                                        Salary:
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @item.Salary
+                                    </dd>
+                                </dl>
+                            </div>
+                            <form asp-controller="Positions" asp-action="Delete" asp-route-id="@item.PositionId">
+                                <input type="hidden" name="PositionId" value="@item.PositionId" />
+                                <div class="d-flex justify-content-between">
+                                    <input type="submit" value="Delete" class="btn btn-danger" />
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </tbody>
+</table>

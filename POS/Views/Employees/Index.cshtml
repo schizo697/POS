@@ -1,0 +1,156 @@
+﻿@model IEnumerable<POS.Models.Employee>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Employee Table</h1>
+
+<p>
+    <a class="btn btn-success" asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Position)
+            </th>
+            <th>
+               Employment Type
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PhoneNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Position.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.employmentType)
+            </td>
+            <td>
+                <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@item.EmployeeId">Edit</a>
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#detailsModal-@item.EmployeeId">
+                    Details
+                </button>
+                <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.EmployeeId">Delete</a>
+            </td>
+        </tr>
+            <!-- DETAILS MODAL FORM -->
+            <div class="modal fade" id="detailsModal-@item.EmployeeId" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Employee Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                <dl class="row">
+                                    <dt class="col-sm-4 text-end">
+                                        Name
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => item.FirstName) @Html.DisplayFor(model => item.LastName)
+                                    </dd>
+
+                                    <dt class="col-sm-4 text-end">
+                                        @Html.DisplayNameFor(model => item.Email):
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => item.Email)
+                                    </dd>
+
+                                    <dt class="col-sm-4 text-end">
+                                        @Html.DisplayNameFor(model => item.Gender):
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => item.Gender)
+                                    </dd>
+
+                                    <dt class="col-sm-4 text-end">
+                                        @Html.DisplayNameFor(model => item.PhoneNumber):
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => item.PhoneNumber)
+                                    </dd>
+
+                                    <dt class="col-sm-4 text-end">
+                                        @Html.DisplayNameFor(model => item.Position):
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => item.Position.Title)
+                                    </dd>
+
+                                    <dt class="col-sm-4 text-end">
+                                        Employment Type
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => item.employmentType)
+                                    </dd>
+
+                                    <dt class="col-sm-4 text-end">
+                                        @Html.DisplayNameFor(model => item.Position.Salary) per hr:
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => item.Position.Salary)
+                                    </dd>
+                                    <dt class="col-sm-4 text-end">
+                                        Total Hour:
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        tbd
+                                    </dd>
+                                    <dt class="col-sm-4 text-end">
+                                        Total Salary:
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        tbd
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </tbody>
+</table>

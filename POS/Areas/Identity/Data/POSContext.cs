@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using POS.Areas.Identity.Data;
+using POS.Models;
 using System.Reflection.Emit;
 
 namespace POS.Areas.Identity.Data;
@@ -14,13 +15,11 @@ public class POSContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<Employee> Employees { get; set; }
-    public DbSet<PositionSalary> PositionSalaries { get; set; }
-
+    public DbSet<Position> Positions { get; set; }
+    public DbSet<Dtr> Dtrs { get; set; }
+    public DbSet<Salary> Salaries { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<PositionSalary>()
-        .Property(p => p.Salary)
-        .HasPrecision(18, 2);
 
         base.OnModelCreating(builder);
     }

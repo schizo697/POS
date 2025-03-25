@@ -1,0 +1,50 @@
+﻿@model POS.Models.Salary
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Salary</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="SalaryId" />
+            <div class="form-group">
+                <label asp-for="EmployeeId" class="control-label"></label>
+                <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GrandTotalHours" class="control-label"></label>
+                <input asp-for="GrandTotalHours" class="form-control" />
+                <span asp-validation-for="GrandTotalHours" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CashAdvance" class="control-label"></label>
+                <input asp-for="CashAdvance" class="form-control" />
+                <span asp-validation-for="CashAdvance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GrandTotalSalary" class="control-label"></label>
+                <input asp-for="GrandTotalSalary" class="form-control" />
+                <span asp-validation-for="GrandTotalSalary" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

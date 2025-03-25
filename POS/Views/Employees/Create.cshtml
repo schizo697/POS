@@ -1,0 +1,67 @@
+﻿@model POS.Models.Employee
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="bg-white p-4 rounded shadow-lg mx-auto" style="max-width: 60%; min-width: 400px;">
+    <h2 class="text-center mb-4">Add Employee</h2>
+    <form asp-action="Create">
+        <div class="row">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="Gender" class="form-label"></label>
+                <select asp-for="Gender" class="form-control" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="PositionId" class="control-label">Position</label>
+                <select asp-for="PositionId" class ="form-control" asp-items="ViewBag.PositionId">
+                    <option value="" disabled selected>Select Position</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="employmentType" class="form-label">Employment Type</label>
+                <select asp-for="employmentType" class="form-control" required>
+                    <option value="" disabled selected>Select Employment Type</option>
+                    <option value="FullTime">Full Time</option>
+                    <option value="FullTime">Part Time</option>
+                </select>
+                <span asp-validation-for="employmentType" class="text-danger"></span>
+            </div>
+            <div class="d-flex  justify-content-center gap-lg-5">
+                <a class="btn btn-danger" asp-action="Index">Back to List</a>
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
