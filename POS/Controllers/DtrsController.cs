@@ -64,6 +64,44 @@ namespace POS.Controllers
 
             if (ModelState.IsValid)
             {
+                //calculate total hours
+                double totalHours = dtr.Hours;
+
+                //get employee salary
+                var employee = await _context.Employees.Include(employee => employee.Position)
+                    .FirstOrDefaultAsync(employee => employee.EmployeeId == dtr.EmployeeId);
+
+                if (employee == null)
+                {
+                    ModelState.AddModelError("", "Employee Not Found");
+                    return View(dtr);
+                }
+
+                //calculate salary
+                decimal salary = employee.Position?.Salary ?? 0;
+                decimal totalSalary = (decimal)totalHours * salary;
+
+                //check if employee have salary record
+                var salaryRecord = await _context.Salaries.FirstOrDefaultAsync(salary => salary.EmployeeId == dtr.EmployeeId);
+
+                if (salaryRecord != null)
+                {
+                    //update employee salary
+                    salaryRecord.GrandTotalHours = Math.Round(salaryRecord.GrandTotalHours + totalHours, 2);
+                    salaryRecord.GrandTotalSalary += totalSalary;
+                } else
+                {
+                    //create new salary for employee
+                    salaryRecord = new Salary
+                    {
+                        EmployeeId = dtr.EmployeeId,
+                        GrandTotalHours = totalHours,
+                        GrandTotalSalary = totalSalary,
+                        CashAdvance = 0
+                    };
+                    _context.Salaries.Add(salaryRecord);
+                }
+
                 _context.Add(dtr);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

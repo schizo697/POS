@@ -48,7 +48,7 @@ namespace POS.Controllers
         // GET: Salaries/Create
         public IActionResult Create()
         {
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "Email");
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "FullName");
             return View();
         }
 
@@ -57,11 +57,31 @@ namespace POS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SalaryId,EmployeeId,GrandTotalHours,CashAdvance,GrandTotalSalary")] Salary salary)
+        public async Task<IActionResult> Create([Bind("SalaryId,EmployeeId,CashAdvance")] Salary salary)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(salary);
+
+                //check if employee have salary record
+                var existingSalary = await _context.Salaries.FirstOrDefaultAsync(existingSalary => existingSalary.EmployeeId == salary.EmployeeId);
+
+                if (existingSalary != null)
+                {
+
+                    //subtract cash advance from grand total salary
+                    existingSalary.GrandTotalSalary -= (existingSalary.CashAdvance ?? 0);
+                    existingSalary.GrandTotalSalary -= (salary.CashAdvance ?? 0);
+
+                    //update cash advance
+                    existingSalary.CashAdvance = salary.CashAdvance;
+                    _context.Update(existingSalary);
+                }
+                else
+                {
+                    salary.GrandTotalSalary -= (salary.CashAdvance ?? 0);
+                    _context.Add(salary);
+                }
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -91,7 +111,7 @@ namespace POS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SalaryId,EmployeeId,GrandTotalHours,CashAdvance,GrandTotalSalary")] Salary salary)
+        public async Task<IActionResult> Edit(int id, [Bind("SalaryId,EmployeeId,CashAdvance")] Salary salary)
         {
             if (id != salary.SalaryId)
             {
@@ -102,8 +122,22 @@ namespace POS.Controllers
             {
                 try
                 {
-                    _context.Update(salary);
-                    await _context.SaveChangesAsync();
+                    var existingSalary = await _context.Salaries.FirstOrDefaultAsync(s => s.EmployeeId == salary.EmployeeId);
+
+                    if (existingSalary != null)
+                    {
+                        // Add back the previous cash advance (restore deducted amount)
+                        existingSalary.GrandTotalSalary += (existingSalary.CashAdvance ?? 0);
+
+                        // Subtract the new cash advance
+                        existingSalary.GrandTotalSalary -= (salary.CashAdvance ?? 0);
+
+                        // Update the cash advance
+                        existingSalary.CashAdvance = salary.CashAdvance;
+
+                        _context.Update(existingSalary);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -118,9 +152,11 @@ namespace POS.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "Email", salary.EmployeeId);
             return View(salary);
         }
+
 
         // GET: Salaries/Delete/5
         public async Task<IActionResult> Delete(int? id)
