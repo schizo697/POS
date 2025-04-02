@@ -14,12 +14,18 @@ namespace POS.Models
         [Range(0, double.MaxValue)]
         public double GrandTotalHours { get; set; }
 
-        [Column(TypeName = "decimal(18,0)")]
+        [NotMapped]
+        public string FormattedGrandTotalHours => $"{(int)GrandTotalHours}:{(int)((GrandTotalHours - (int)GrandTotalHours) * 60):D2}";
+
+        [Column(TypeName = "decimal(18,2)")]
         public decimal? CashAdvance { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(18,0)")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal GrandTotalSalary { get; set; }
+
+        [Required]
+        public string Status { get; set; } = "Unpaid";
 
         [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }

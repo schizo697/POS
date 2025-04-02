@@ -10,6 +10,9 @@ namespace POS.Models
         [Key]
         public int EmployeeId { get; set; }
 
+        [StringLength(20)]
+        public string EmployeeCode { get; set; } = string.Empty;
+
         [Required]
         [StringLength(100)]
         public string FirstName { get; set; }
@@ -34,7 +37,7 @@ namespace POS.Models
         [StringLength(100)]
         public string employmentType { get; set; }
 
-        public int? PositionId { get; set; }
+        public int PositionId { get; set; }
 
         [ForeignKey("PositionId")]
         public Position? Position { get; set; }

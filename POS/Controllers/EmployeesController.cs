@@ -71,9 +71,21 @@ namespace POS.Controllers
                 ViewData["PositionId"] = new SelectList(_context.Positions, "PositionId", "Title", employee.PositionId);
                 return View(employee);
             }
+
+            employee.EmployeeCode = await GenerateEmployeeCode();
+            
             _context.Add(employee);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        //Generate Employee Code
+        private async Task<string> GenerateEmployeeCode()
+        {
+            string year = DateTime.Now.Year.ToString();
+            int lastId = await _context.Employees.Where(employee => employee.EmployeeCode.StartsWith($"EMP-{year}-")).CountAsync();
+
+            return $"EMP-{year}-{(lastId + 1).ToString("D4")}";
         }
 
         // GET: Employees/Edit/5

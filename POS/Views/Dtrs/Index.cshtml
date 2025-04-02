@@ -5,25 +5,28 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Index</h1>
+<h1 class="mb-4">Daily Time Record</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table id="table" class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Employee)
+                Employee Code
+            </th>
+            <th>
+                Name
             </th>
             <th>
                 Date
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TimeIn)
+                Time In
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TimeOut)
+                Time Out
             </th>
             <th>
                 Total Hours
@@ -34,6 +37,9 @@
     <tbody>
 @foreach (var item in Model) {  
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.EmployeeCode)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Employee.FullName)
             </td>
@@ -47,7 +53,7 @@
                 @Html.DisplayFor(modelItem => item.TimeOut)
             </td>
             <td>
-                    @Html.DisplayFor(modelItem => item.FormattedHours) Hrs|Min
+                @Html.DisplayFor(modelItem => item.FormattedHours) Hrs|Min
             </td>
             <td>
                 <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@item.DtrId">Edit</a>

@@ -67,7 +67,8 @@ namespace POS.Controllers
             if (ModelState.IsValid)
             {
                 //calculate total hours
-                double totalHours = dtr.Hours;
+                TimeSpan timeWorked = (TimeSpan)(dtr.TimeOut - dtr.TimeIn);
+                double totalHours = timeWorked.TotalMinutes / 60;
 
                 //get employee salary
                 var employee = await _context.Employees.Include(employee => employee.Position)
@@ -83,14 +84,26 @@ namespace POS.Controllers
                 decimal salary = employee.Position?.Salary ?? 0;
                 decimal totalSalary = (decimal)totalHours * salary;
 
+                //Apply deduction to the full time employees
+                if (employee.employmentType == "FullTime")
+                {
+                    decimal sss = totalSalary * 0.045m; //4.5%
+                    decimal pagibig = totalSalary * 0.02m; //2%
+                    decimal philhealth = totalSalary * 0.035m; //3.5%
+                    decimal totalDeduction = sss + pagibig + philhealth;
+
+                    totalSalary -= totalDeduction;
+
+                }
+
                 //check if employee have salary record
-                var salaryRecord = await _context.Salaries.FirstOrDefaultAsync(salary => salary.EmployeeId == dtr.EmployeeId);
+                var salaryRecord = await _context.Salaries.FirstOrDefaultAsync(salary => salary.EmployeeId == dtr.EmployeeId && salary.Status == "Unpaid");
 
                 if (salaryRecord != null)
                 {
                     //update employee salary
                     salaryRecord.GrandTotalHours = Math.Round(salaryRecord.GrandTotalHours + totalHours, 2);
-                    salaryRecord.GrandTotalSalary += totalSalary;
+                    salaryRecord.GrandTotalSalary = Math.Round(salaryRecord.GrandTotalSalary + totalSalary, 2);
                 } else
                 {
                     //create new salary for employee
@@ -99,7 +112,8 @@ namespace POS.Controllers
                         EmployeeId = dtr.EmployeeId,
                         GrandTotalHours = totalHours,
                         GrandTotalSalary = totalSalary,
-                        CashAdvance = 0
+                        CashAdvance = 0,
+                        Status = "Unpaid"
                     };
                     _context.Salaries.Add(salaryRecord);
                 }

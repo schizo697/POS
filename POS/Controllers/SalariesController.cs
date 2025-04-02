@@ -194,6 +194,21 @@ namespace POS.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        //Update Salary Status
+        [HttpPost]
+        public async Task<IActionResult> UpdateStatus(int salaryId, string status)
+        {
+            var salary = await _context.Salaries.FindAsync(salaryId);
+            if (salary != null)
+            {
+                salary.Status = status; // Update status
+                _context.Update(salary);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+
         private bool SalaryExists(int id)
         {
             return _context.Salaries.Any(e => e.SalaryId == id);
