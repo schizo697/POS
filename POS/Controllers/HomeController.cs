@@ -15,7 +15,8 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return RedirectToPage("/Account/Login", new { area = "Identity" });
+        return View();
+        //return RedirectToPage("/Account/Login", new { area = "Identity" });
     }
 
 
