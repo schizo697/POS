@@ -44,6 +44,33 @@ namespace POS.Controllers
                 return NotFound();
             }
 
+            var position = await _context.Positions.FirstOrDefaultAsync(position => position.PositionId == salary.Employee.PositionId);
+
+            if (position == null)
+            {
+                return NotFound();
+            }
+
+            var paySlipDate = DateTime.Now.Date;
+            double totalhours = salary.GrandTotalHours;
+            decimal salarywithoutDeductions = (decimal)totalhours * salary.Employee.Position?.Salary ?? 0;
+
+            if (salary.Employee.employmentType == "FullTime")
+            {
+                decimal sss = salarywithoutDeductions * 0.045m; //4.5%
+                decimal pagibig = salarywithoutDeductions * 0.02m; //2%
+                decimal philhealth = salarywithoutDeductions * 0.035m; //3.5%
+                decimal totalDeduction = sss + pagibig + philhealth;
+
+                ViewBag.sss = sss.ToString("N2");
+                ViewBag.pagibig = pagibig.ToString("N2");
+                ViewBag.philhealth = philhealth.ToString("N2");
+                ViewBag.totalDeduction = totalDeduction.ToString("N2");
+            }
+
+            ViewBag.salarywithoutDeductions = salarywithoutDeductions.ToString("N2");
+            ViewBag.paySlipDate = paySlipDate.ToString("MMMM yyyy");
+
             return View(salary);
         }
 

@@ -52,22 +52,22 @@
 <table id="table" class="table table-striped">
     <thead>
         <tr>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.Title)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Salary)
+            <th class="text-center">
+                @Html.DisplayNameFor(model => model.Salary)/Hr
             </th>
-            <th></th>
+            <th class="text-center">Actions</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model) {
             <tr>
-                <td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
-                <td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.Salary)
                 </td>
                 <td class="text-center">

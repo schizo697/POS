@@ -1,43 +1,129 @@
 ﻿@model POS.Models.Salary
 
+
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>Employee Payslip</h1>
+<div >
+    <a class="btn btn-info me-2" asp-action="Index">Back to List</a>
+    <button class="btn btn-secondary" onclick="printPayslip()">Print Payslip</button>
+</div>
+<div id="payslip" class="container mt-5 mb-2">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center lh-1 mb-2">
+                        <h6 class="fw-bold">Payslip</h6> <span class="fw-normal">Payment slip for the month of @ViewBag.paySlipDate</span>
+                    </div>
+                    <div class="d-flex justify-content-end"> <span>Working Branch: B46 Sari-Sari Store</span> </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div> <span class="fw-bolder">Employee:</span> <small class="ms-3">@Model.Employee.FullName</small> </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div> <span class="fw-bolder">Position:</span> <small class="ms-3">@Model.Employee.Position.Title</small> </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div> <span class="fw-bolder">Employment Type:</span> <small class="ms-3">@Model.Employee.employmentType</small> </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div> <span class="fw-bolder">Salary / Hr:</span> <small class="ms-3">@Model.Employee.Position.Salary</small> </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div> <span class="fw-bolder">Total Salary:</span> <small class="ms-3">@ViewBag.salarywithoutDeductions</small> </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div> <span class="fw-bolder">Total Hours:</span> <small class="ms-3">@Model.GrandTotalHours</small> </div>
+                                </div>
+                            </div>
+                        </div>
+                        @if (ViewBag.sss != null)
+                        {
+                            <table class="mt-4 table table-bordered">
+                                <thead class="bg-dark text-white">
+                                    <tr>
+                                        <th scope="col">Deductions</th>
+                                        <th scope="col">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">SSS deduction</th>
+                                        <td>@ViewBag.sss</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Pagibig deduction</th>
+                                        <td>@ViewBag.pagibig</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Philhealth deduction</th>
+                                        <td>@ViewBag.philhealth</td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <th scope="row">Total Deduction</th>
+                                        <td>@ViewBag.totalDeduction</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        } else
+                        {
+                            <table class="mt-4 table table-bordered">
+                                <thead class="bg-dark text-white">
+                                    <tr>
+                                        <th scope="col">Deductions</th>
+                                        <th scope="col">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">SSS deduction</th>
+                                        <td>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Pagibig deduction</th>
+                                        <td>0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Philhealth deduction</th>
+                                        <td>0.00</td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <th scope="row">Total Deduction</th>
+                                        <td>0.00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <div class="d-flex flex-column mt-2"> 
+                            <span class="fw-bold">Net Salary : @Model.GrandTotalSalary</span>
+                            <span class="fw-bolder">For @Model.Employee.FullName</span> 
+                            <span class="mt-4">Authorised Signatory</span> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+        function printPayslip() {
+        var printContents = document.getElementById('payslip').innerHTML;
+        var originalContents = document.body.innerHTML;
 
-<div>
-    <h4>Salary</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GrandTotalHours)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GrandTotalHours)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CashAdvance)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CashAdvance)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.GrandTotalSalary)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.GrandTotalSalary)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Employee)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Employee.Email)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.SalaryId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
+</script>
