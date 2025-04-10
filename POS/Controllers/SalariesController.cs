@@ -24,7 +24,15 @@ namespace POS.Controllers
         // GET: Salaries
         public async Task<IActionResult> Index()
         {
-            var pOSContext = _context.Salaries.Include(s => s.Employee);
+            var pOSContext = _context.Salaries.Include(s => s.Employee).Include(dtr => dtr.Employee);
+
+            var SandD = await pOSContext.ToListAsync();
+            
+            foreach (var data in SandD)
+            {
+                var employeeName = data.Employee.FullName;
+            }
+
             return View(await pOSContext.ToListAsync());
         }
 
@@ -96,18 +104,22 @@ namespace POS.Controllers
 
                 if (existingSalary != null)
                 {
+                    //calculate total cash advance
+                    decimal totalCashAdvance = (existingSalary.CashAdvance ?? 0) + (salary.CashAdvance ?? 0);
 
-                    //subtract cash advance from grand total salary
-                    existingSalary.GrandTotalSalary -= (existingSalary.CashAdvance ?? 0);
-                    existingSalary.GrandTotalSalary -= (salary.CashAdvance ?? 0);
+                    //recalculate grand total salary
+                    existingSalary.GrandTotalSalary = existingSalary.GrandTotalSalary + (existingSalary.CashAdvance ?? 0) - totalCashAdvance;
+
 
                     //update cash advance
-                    existingSalary.CashAdvance = salary.CashAdvance;
+                    existingSalary.CashAdvance = totalCashAdvance;
+
                     _context.Update(existingSalary);
                 }
                 else
                 {
-                    salary.GrandTotalSalary -= (salary.CashAdvance ?? 0);
+                    salary.CashAdvance = salary.CashAdvance ?? 0;
+                    salary.GrandTotalSalary -= (decimal)salary.CashAdvance;
                     _context.Add(salary);
                 }
 

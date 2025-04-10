@@ -12,8 +12,8 @@ using POS.Areas.Identity.Data;
 namespace POS.Migrations
 {
     [DbContext(typeof(POSContext))]
-    [Migration("20250325174659_salary")]
-    partial class salary
+    [Migration("20250409205202_db")]
+    partial class db
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -249,6 +249,9 @@ namespace POS.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("TimeIn")
                         .HasColumnType("datetime2");
 
@@ -274,6 +277,11 @@ namespace POS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("EmployeeCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -292,7 +300,7 @@ namespace POS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PositionId")
+                    b.Property<int>("PositionId")
                         .HasColumnType("int");
 
                     b.Property<string>("employmentType")
@@ -340,7 +348,7 @@ namespace POS.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SalaryId"));
 
                     b.Property<decimal?>("CashAdvance")
-                        .HasColumnType("decimal(18,0)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -349,7 +357,11 @@ namespace POS.Migrations
                         .HasColumnType("float");
 
                     b.Property<decimal>("GrandTotalSalary")
-                        .HasColumnType("decimal(18,0)");
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SalaryId");
 
@@ -424,7 +436,9 @@ namespace POS.Migrations
                 {
                     b.HasOne("POS.Models.Position", "Position")
                         .WithMany("Employees")
-                        .HasForeignKey("PositionId");
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Position");
                 });

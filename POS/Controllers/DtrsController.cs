@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using POS.Areas.Identity.Data;
@@ -68,7 +69,8 @@ namespace POS.Controllers
             {
                 //calculate total hours
                 TimeSpan timeWorked = (TimeSpan)(dtr.TimeOut - dtr.TimeIn);
-                double totalHours = timeWorked.TotalMinutes / 60;
+                double hours = timeWorked.TotalMinutes / 60;
+                double totalHours = dtr.Hours = hours;
 
                 //get employee salary
                 var employee = await _context.Employees.Include(employee => employee.Position)
@@ -159,6 +161,71 @@ namespace POS.Controllers
             {
                 try
                 {
+                    //Get Original Dtr
+                    var originalDtr = await _context.Dtrs.AsNoTracking().FirstOrDefaultAsync(d => d.DtrId == id);
+                    if (originalDtr == null)
+                    {
+                        return NotFound();
+                    }
+
+                    //Calc Timeworked
+                    TimeSpan dtrTimeWorked = (TimeSpan)(originalDtr.TimeOut - originalDtr.TimeIn);
+                    double dtrHours = dtrTimeWorked.TotalMinutes / 60;
+
+                    var employee = await _context.Employees.Include(employee => employee.Position)
+                        .FirstOrDefaultAsync(employee => employee.EmployeeId == dtr.EmployeeId);
+
+                    if (employee == null)
+                    {
+                        ModelState.AddModelError("", "Employee Not Found");
+                        return View(dtr);
+                    }
+
+                    decimal salaryRate = employee.Position?.Salary ?? 0;
+                    decimal dtrTotalSalary = (decimal)dtrHours * salaryRate;
+
+                    if (employee.employmentType == "FullTime")
+                    {
+                        decimal sss = dtrTotalSalary * 0.045m;
+                        decimal pagibig = dtrTotalSalary * 0.02m;
+                        decimal philhealth = dtrTotalSalary * 0.035m;
+                        decimal totalDeduction = sss + pagibig + philhealth;
+
+                        dtrTotalSalary -= totalDeduction;
+                    }
+
+                    //Calculate new time worked
+                    TimeSpan newTimeWorked = (TimeSpan)(dtr.TimeOut - dtr.TimeIn);
+                    double newHours = newTimeWorked.TotalMinutes / 60;
+                    double TotalHours = dtr.Hours = newHours;
+
+                    decimal newTotalSalary = (decimal)newHours * salaryRate;
+
+                    if (employee.employmentType == "FullTime")
+                    {
+                        decimal sss = newTotalSalary * 0.045m;
+                        decimal pagibig = newTotalSalary * 0.02m;
+                        decimal philhealth = newTotalSalary * 0.035m;
+                        decimal totalDeduction = sss + pagibig + philhealth;
+
+                        newTotalSalary -= totalDeduction;
+                    }
+
+                    //Update Salary  Record
+                    var salaryRecord = await _context.Salaries.FirstOrDefaultAsync(salary => salary.EmployeeId == dtr.EmployeeId && salary.Status == "Unpaid");
+
+                    if (salaryRecord != null)
+                    {
+                        salaryRecord.GrandTotalHours = Math.Round(salaryRecord.GrandTotalHours - dtrHours + newHours, 2);
+                        salaryRecord.GrandTotalSalary = Math.Round(salaryRecord.GrandTotalSalary - dtrTotalSalary + newTotalSalary, 2);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Record already paid");
+                        return RedirectToAction(nameof(Index));
+                    }
+
+
                     _context.Update(dtr);
                     await _context.SaveChangesAsync();
                 }
@@ -204,11 +271,50 @@ namespace POS.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var dtr = await _context.Dtrs.FindAsync(id);
-            if (dtr != null)
+            if (dtr == null)
             {
-                _context.Dtrs.Remove(dtr);
+                return NotFound();
             }
 
+            TimeSpan dtrTimeWorked = (TimeSpan)(dtr.TimeOut - dtr.TimeIn);
+            double dtrHours = dtrTimeWorked.TotalMinutes / 60;
+
+            var employee = await _context.Employees.Include(employee => employee.Position)
+                .FirstOrDefaultAsync(employee => employee.EmployeeId == dtr.EmployeeId);
+
+            if (employee == null)
+            {
+                ModelState.AddModelError("", "Employee Not Found!");
+                return View(dtr);
+            }
+
+            decimal salaryRate = employee.Position?.Salary ?? 0;
+            decimal dtrTotalSalary = (decimal)dtrHours * salaryRate;
+
+            if (employee.employmentType == "FullTime")
+            {
+                decimal sss = dtrTotalSalary * 0.045m;
+                decimal pagibig = dtrTotalSalary * 0.02m;
+                decimal philhealth = dtrTotalSalary * 0.035m;
+                decimal totalDeduction = sss + pagibig + philhealth;
+
+                dtrTotalSalary -= totalDeduction;
+            }
+
+            //Update Salary Record
+            var salaryRecord = await _context.Salaries.FirstOrDefaultAsync(salary => salary.EmployeeId == dtr.EmployeeId && salary.Status == "Unpaid");
+
+            if(salaryRecord != null)
+            {
+                salaryRecord.GrandTotalHours = Math.Round(salaryRecord.GrandTotalHours - dtrHours, 2);
+                salaryRecord.GrandTotalSalary = Math.Round(salaryRecord.GrandTotalSalary - dtrTotalSalary, 2);
+            } else
+            {
+                ModelState.AddModelError("", "Record already paid");
+                return View(dtr);
+            }
+
+                _context.Remove(dtr);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

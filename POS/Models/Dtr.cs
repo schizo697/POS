@@ -24,8 +24,8 @@ namespace POS.Models
         [DisplayFormat(DataFormatString = "{0:HH:mm:ss}", ApplyFormatInEditMode = true)]
         public DateTime? TimeOut { get; set; }
 
-        [NotMapped]
-        public double Hours => TimeOut.HasValue ? (TimeOut.Value - TimeIn).TotalHours : 0;
+        public double Hours { get; set; }
+
         [NotMapped]
         public string FormattedHours => $"{(int)Hours}:{(int)((Hours - (int)Hours) * 60):D2}";
 

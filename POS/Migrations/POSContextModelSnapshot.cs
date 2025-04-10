@@ -246,6 +246,9 @@ namespace POS.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
+                    b.Property<double>("Hours")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("TimeIn")
                         .HasColumnType("datetime2");
 
@@ -294,7 +297,7 @@ namespace POS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PositionId")
+                    b.Property<int>("PositionId")
                         .HasColumnType("int");
 
                     b.Property<string>("employmentType")
@@ -430,7 +433,9 @@ namespace POS.Migrations
                 {
                     b.HasOne("POS.Models.Position", "Position")
                         .WithMany("Employees")
-                        .HasForeignKey("PositionId");
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Position");
                 });

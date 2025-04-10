@@ -55,9 +55,9 @@
                 <td>
                     <form asp-action="UpdateStatus" method="post">
                         <input type="hidden" name="salaryId" value="@item.SalaryId" />
-                        <select class="form-select" style="width: 50%;" name="status" id="statusSelect" onchange="this.form.submit(); updateSelectColor(this);">
-                            <option value="Unpaid" selected="@(item.Status == "Unpaid" ? "selected" : null)">Unpaid</option>
-                            <option value="Paid" selected="@(item.Status == "Paid" ? "selected" : null)">Paid</option>
+                        <select class="form-select" name="status" id="statusSelect" onchange="this.form.submit(); updateSelectColor(this);">
+                            <option value="" selected disabled>Unpaid</option>
+                            <option value="Paid" selected="@(item.Status == "Paid")">Paid</option>
                         </select>
                     </form>
                 </td>
