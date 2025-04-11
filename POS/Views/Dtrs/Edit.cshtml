@@ -1,50 +1,51 @@
 ﻿@model POS.Models.Dtr
 
-@{
-    ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
-}
+<div class="bt-white p-4 rounded shadow-lg mx-auto">
+    <div class="row justify-content-center""">
+        <div class="col-md-8">
+            <form asp-controller="Dtrs" asp-action="Edit" asp-route-id="@Model.DtrId">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<h1>Edit</h1>
+                <!-- Hidden DtrId -->
+                <input type="hidden" asp-for="DtrId" />
 
-<h4>Dtr</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="DtrId" />
-            <div class="form-group">
-                <label asp-for="EmployeeId" class="control-label"></label>
-                <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
-                <span asp-validation-for="EmployeeId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DtrDate" class="control-label"></label>
-                <input asp-for="DtrDate" class="form-control" />
-                <span asp-validation-for="DtrDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TimeIn" class="control-label"></label>
-                <input asp-for="TimeIn" class="form-control" />
-                <span asp-validation-for="TimeIn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TimeOut" class="control-label"></label>
-                <input asp-for="TimeOut" class="form-control" />
-                <span asp-validation-for="TimeOut" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+                <!-- Employee Selection Dropdown -->
+                <div class="mb-3">
+                    <label asp-for="EmployeeId" class="control-label">Employee Name</label>
+                    <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId"></select>
+                    <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                </div>
+
+                <!-- Date Input -->
+                <div class="mb-3">
+                    <label asp-for="DtrDate" class="control-label"></label>
+                    <input asp-for="DtrDate" class="form-control" type="date" />
+                    <span asp-validation-for="DtrDate" class="text-danger"></span>
+                </div>
+
+                <!-- TimeIn Input -->
+                <div class="mb-3">
+                    <label asp-for="TimeIn" class="control-label"></label>
+                    <input asp-for="TimeIn" class="form-control" type="time" />
+                    <span asp-validation-for="TimeIn" class="text-danger"></span>
+                </div>
+
+                <!-- TimeOut Input -->
+                <div class="mb-3">
+                    <label asp-for="TimeOut" class="control-label"></label>
+                    <input asp-for="TimeOut" class="form-control" type="time" />
+                    <span asp-validation-for="TimeOut" class="text-danger"></span>
+                </div>
+
+                <div class="text-center">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

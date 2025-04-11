@@ -26,6 +26,7 @@ namespace POS.Controllers
         public async Task<IActionResult> Index()
         {
             var pOSContext = _context.Dtrs.Include(d => d.Employee);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "FullName");
             return View(await pOSContext.ToListAsync());
         }
 
@@ -60,16 +61,19 @@ namespace POS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DtrId,EmployeeId,TimeIn,TimeOut")] Dtr dtr)
+        public async Task<IActionResult> Create([Bind("DtrId,EmployeeId,DtrDate,TimeIn,TimeOut")] Dtr dtr)
         {
-
-            dtr.DtrDate = DateTime.Now.Date;
-
             if (ModelState.IsValid)
             {
                 //calculate total hours
-                TimeSpan timeWorked = (TimeSpan)(dtr.TimeOut - dtr.TimeIn);
-                double hours = timeWorked.TotalMinutes / 60;
+                if(dtr.TimeOut < dtr.TimeIn)
+                {
+                    dtr.TimeOut = dtr.TimeOut.Value.AddDays(1);
+                }
+
+                TimeSpan timeWorked = (TimeSpan)(dtr.TimeOut.Value - dtr.TimeIn);
+                double hours = Math.Round(timeWorked.TotalHours, 2);
+                dtr.Hours = hours;
                 double totalHours = dtr.Hours = hours;
 
                 //get employee salary
@@ -141,7 +145,7 @@ namespace POS.Controllers
             {
                 return NotFound();
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "Email", dtr.EmployeeId);
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "EmployeeId", "FullName", dtr.EmployeeId);
             return View(dtr);
         }
 
@@ -169,8 +173,13 @@ namespace POS.Controllers
                     }
 
                     //Calc Timeworked
-                    TimeSpan dtrTimeWorked = (TimeSpan)(originalDtr.TimeOut - originalDtr.TimeIn);
-                    double dtrHours = dtrTimeWorked.TotalMinutes / 60;
+                    if (originalDtr.TimeOut < originalDtr.TimeIn)
+                    {
+                        originalDtr.TimeOut = originalDtr.TimeOut.Value.AddDays(1);
+                    }
+
+                    TimeSpan dtrTimeWorked = (TimeSpan)(originalDtr.TimeOut.Value - originalDtr.TimeIn);
+                    double dtrHours = Math.Round(dtrTimeWorked.TotalHours, 2);
 
                     var employee = await _context.Employees.Include(employee => employee.Position)
                         .FirstOrDefaultAsync(employee => employee.EmployeeId == dtr.EmployeeId);
@@ -195,8 +204,12 @@ namespace POS.Controllers
                     }
 
                     //Calculate new time worked
-                    TimeSpan newTimeWorked = (TimeSpan)(dtr.TimeOut - dtr.TimeIn);
-                    double newHours = newTimeWorked.TotalMinutes / 60;
+                    if (dtr.TimeOut < dtr.TimeIn)
+                    {
+                        dtr.TimeOut = dtr.TimeOut.Value.AddDays(1);
+                    }
+                    TimeSpan newTimeWorked = (TimeSpan)(dtr.TimeOut.Value - dtr.TimeIn);
+                    double newHours = Math.Round(newTimeWorked.TotalHours, 2);
                     double TotalHours = dtr.Hours = newHours;
 
                     decimal newTotalSalary = (decimal)newHours * salaryRate;

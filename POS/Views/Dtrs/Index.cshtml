@@ -8,8 +8,22 @@
 <h1 class="mb-4">Daily Time Record</h1>
 
 <p>
-    <a class="btn btn-primary" asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Create" data-bs-toggle="modal" data-bs-target="#addModal">Create New</a>
 </p>
+<!-- ADD MODAL FORM -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Daily Time Record</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("Create", new Dtr())
+            </div>
+        </div>
+    </div>
+</div>
 <table id="table" class="table">
     <thead>
         <tr>
@@ -50,22 +64,47 @@
                 @Html.DisplayFor(modelItem => item.Employee.FullName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DtrDate)
+                @item.DtrDate.ToString("MM/dd/yyyy")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TimeIn)
+                @item.TimeIn.ToString("hh:mm tt")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TimeOut)
+                @(item.TimeOut?.ToString("hh:mm tt") ?? "N/A")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.FormattedHours) Hrs|Min
             </td>
             <td>
-                <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@item.DtrId">Edit</a>
-                <a class="btn btn-info btn-sm" asp-action="Delete" asp-route-id="@item.DtrId">Delete</a>
+
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal-@item.DtrId">Edit</button>
+                <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.DtrId">Delete</a>
             </td>
         </tr>
-}
+            <!-- EDIT MODAL FORM -->
+            <div class="modal fade" id="editModal-@item.DtrId" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">Edit Position & Salary</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            @await Html.PartialAsync("Edit", new Dtr()
+                           {
+                               DtrId = item.DtrId,
+                               EmployeeId = item.EmployeeId,
+                               DtrDate = item.DtrDate,
+                               TimeIn = item.TimeIn,
+                               TimeOut = item.TimeOut
+                           })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </tbody>
 </table>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
